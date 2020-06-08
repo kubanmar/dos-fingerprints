@@ -10,5 +10,5 @@ class DOSFingerprint():
         self.indices = []
 
 
-    def calculate(dos_energies, dos_values, grid_id):
+    def calculate(dos_energies, dos_values):
         pass
