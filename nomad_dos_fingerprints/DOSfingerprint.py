@@ -10,5 +10,8 @@ class DOSFingerprint():
         self.indices = []
 
 
-    def calculate(dos_energies, dos_values):
+    def calculate(self, dos_energies, dos_values):
         pass
+
+    def _integrate_to_bins(self, xs, ys):
+        return xs, ys
