@@ -27,8 +27,16 @@ class DOSFingerprint():
         xstart = round(int(xs[0] / (self.stepsize * 1.)) * self.stepsize, 8)  # define the limits that fit with the predefined stepsize
         xstop = round(int(xs[-1] / (self.stepsize * 1.)) * self.stepsize, 8)
         x_interp = np.arange(xstart, xstop + self.stepsize, self.stepsize)
-        y_interp = np.array(list(map(lambda x: x * self.stepsize, np.interp(x_interp, xs, ys))))
-        return x_interp, y_interp
+        y_interp = np.interp(x_interp, xs, ys)
+        y_integ = []
+        """
+        for idx in range(len(x_interp)-1):
+            print(x_interp[idx:idx+2], y_interp[idx:idx + 2])
+            print(np.trapz(y_interp[idx:idx + 1], x_interp[idx:idx + 1]))
+            y_integ.append(np.trapz(y_interp[idx:idx + 1], x_interp[idx:idx + 1]))
+        """
+        y_integ = np.array([np.trapz(y_interp[idx:idx + 2], x_interp[idx:idx + 2]) for idx in range(len(x_interp)-1)])
+        return x_interp[:-1], y_integ
 
     def _convert_dos(self, energy, dos):
         """
