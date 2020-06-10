@@ -8,4 +8,6 @@ def test_fingerprint_values():
     
     for fp, mid in test_data['fingerprints']:
         raw_data  = test_data[mid]
-        assert json.loads(fp)['bins'] == DOSFingerprint().calculate(raw_data['dos_energies'], raw_data['dos_values'])
+        new_fingerprint = DOSFingerprint().calculate(raw_data['dos_energies'], raw_data['dos_values'])
+        assert json.loads(fp)['indices'] == new_fingerprint.indices
+        assert json.loads(fp)['bins'] == new_fingerprint.bins
