@@ -12,6 +12,6 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://git.physik.hu-berlin.de/kuban/nomad-dos-fingerprints",
-    install_requires = ['numpy', 'bitarray'],
+    install_requires = ['numpy'],
     packages=['nomad_dos_fingerprints']
 )
