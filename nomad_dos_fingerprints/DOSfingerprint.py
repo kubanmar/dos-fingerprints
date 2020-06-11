@@ -25,6 +25,16 @@ class DOSFingerprint():
     def to_dict(self):
         return dict(bins = self.bins, indices = self.indices, stepsize = self.stepsize, grid_id = self.grid_id, filling_factor = self.filling_factor)
 
+    @staticmethod
+    def from_dict(fp_dict):
+        self = DOSFingerprint()
+        self.bins = fp_dict['bins']
+        self.indices = fp_dict['indices']
+        self.stepsize = fp_dict['stepsize']
+        self.grid_id = fp_dict['grid_id']
+        self.filling_factor = fp_dict['filling_factor']
+        return self
+
     def _integrate_to_bins(self, xs, ys):
         """
         Performs stepwise numerical integration of ``ys`` over the range of ``xs``. The stepsize of the generated histogram is controlled by DOSFingerprint().stepsize.
@@ -36,12 +46,6 @@ class DOSFingerprint():
         x_interp = np.arange(xstart, xstop + self.stepsize, self.stepsize)
         y_interp = np.interp(x_interp, xs, ys)
         y_integ = []
-        """
-        for idx in range(len(x_interp)-1):
-            print(x_interp[idx:idx+2], y_interp[idx:idx + 2])
-            print(np.trapz(y_interp[idx:idx + 1], x_interp[idx:idx + 1]))
-            y_integ.append(np.trapz(y_interp[idx:idx + 1], x_interp[idx:idx + 1]))
-        """
         y_integ = np.array([np.trapz(y_interp[idx:idx + 2], x_interp[idx:idx + 2]) for idx in range(len(x_interp)-1)])
         return x_interp[:-1], y_integ
 
@@ -69,7 +73,8 @@ class DOSFingerprint():
         """
         grid_array = grid.grid()
         # cut the energy and dos to grid size
-        energy, dos = np.transpose([(e,d) for e,d in zip(energy, dos) if (e >= grid_array[0][0] and e <= grid_array[-1][0])])        
+        energy, dos = np.transpose([(e,d) for e,d in zip(energy, dos) if (e >= grid_array[0][0] and e <= grid_array[-1][0])])
+        # calculate fingerprint
         bin_fp = ''
         grid_index = 0
         for idx, grid_e in enumerate(grid_array):

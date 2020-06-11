@@ -3,4 +3,4 @@
 *.code-workspace
 run_tests.bat
 .vscode
-.coverage
+.coverage*

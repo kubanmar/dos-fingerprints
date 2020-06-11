@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 
-from nomad_dos_fingerprints import DOSFingerprint
+from nomad_dos_fingerprints import DOSFingerprint, tanimoto_similarity
 from nomad_dos_fingerprints.DOSfingerprint import ELECTRON_CHARGE 
 
 def test_integrate_to_bins():
@@ -29,3 +29,11 @@ def test_convert_dos():
     x, y = fp._convert_dos(test_data_x* ELECTRON_CHARGE, [test_data_y/ ELECTRON_CHARGE])
     assert np.isclose(x,test_data_x).all()
     assert np.isclose(y, test_data_y).all()
+
+def test_serialization():
+    test_data_x = np.linspace(0, np.pi, num = 1000)
+    test_data_y = [np.sin(x) for x in test_data_x]
+    fp = DOSFingerprint(stepsize=0.001).calculate([x * ELECTRON_CHARGE for x in test_data_x], [[x / ELECTRON_CHARGE for x in test_data_y]])
+    fp_json = fp.to_dict()
+    fp_again = DOSFingerprint().from_dict(fp_json)
+    assert tanimoto_similarity(fp, fp_again) == 1

@@ -1,7 +1,9 @@
 import pytest, os, json
 from bitarray import bitarray
-from nomad_dos_fingerprints import tanimoto_similarity, DOSFingerprint
+from nomad_dos_fingerprints import tanimoto_similarity, DOSFingerprint, Grid
 from nomad_dos_fingerprints.DOSfingerprint import ELECTRON_CHARGE
+from nomad_dos_fingerprints.plotting import plot_FP_in_grid
+import matplotlib.pyplot as plt
 
 with open(os.path.join(os.path.dirname(__file__), 'fingerprint_generation_test_data.json'), 'r') as test_data_file:
     test_data = json.load(test_data_file)
@@ -25,8 +27,17 @@ def test_matching_of_spectra():
     data = test_data["17661:2634879"]
     cut_energies = []
     cut_dos = []
-    cut_energies = [e for e,d in zip(data['dos_energies'], data['dos_values'][0]) if (e / ELECTRON_CHARGE > -4 and e / ELECTRON_CHARGE < 2)]
-    cut_dos = [d for e,d in zip(data['dos_energies'], data['dos_values'][0]) if (e / ELECTRON_CHARGE > -4 and e / ELECTRON_CHARGE < 2)]
+    cut_energies = [e for e,d in zip(data['dos_energies'], data['dos_values'][0]) if (e / ELECTRON_CHARGE > -7.3 and e / ELECTRON_CHARGE < 2)]
+    cut_dos = [d for e,d in zip(data['dos_energies'], data['dos_values'][0]) if (e / ELECTRON_CHARGE > -7.3 and e / ELECTRON_CHARGE < 2)]
+    plt.figure()
+    plt.plot([x / ELECTRON_CHARGE for x in data['dos_energies']], data['dos_values'][0])
+    plt.plot([x / ELECTRON_CHARGE for x in cut_energies], cut_dos)
     fp = DOSFingerprint().calculate(data['dos_energies'], data['dos_values'])
     cut_fp = DOSFingerprint().calculate(cut_energies, [cut_dos])
-    assert tanimoto_similarity(fp, cut_fp) == 1
+    grid = Grid().create(grid_id=fp.grid_id)
+    #print(grid.grid()[cut_fp.indices[0]][0])
+    plt.figure()
+    plot_FP_in_grid(fp, grid, show=False)
+    plot_FP_in_grid(cut_fp, grid, alpha = 0.5)
+    assert tanimoto_similarity(cut_fp, fp) == tanimoto_similarity(fp, cut_fp)
+    assert 1 - tanimoto_similarity(fp, cut_fp) < 1e-2  
