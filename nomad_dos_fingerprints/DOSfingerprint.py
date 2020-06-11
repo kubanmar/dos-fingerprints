@@ -12,13 +12,18 @@ class DOSFingerprint():
         self.indices = []
         self.stepsize = stepsize
         self.filling_factor = 0
+        self.grid_id = None
 
     def calculate(self, dos_energies, dos_values):
         energy, dos = self._convert_dos(dos_energies, dos_values)
         raw_energies, raw_dos = self._integrate_to_bins(energy, dos)
         grid = Grid().create()
+        self.grid_id = grid.get_grid_id()
         self.indices, self.bins = self._calculate_bytes(raw_energies, raw_dos, grid)
         return self
+
+    def to_dict(self):
+        return dict(bins = self.bins, indices = self.indices, stepsize = self.stepsize, grid_id = self.grid_id, filling_factor = self.filling_factor)
 
     def _integrate_to_bins(self, xs, ys):
         """
