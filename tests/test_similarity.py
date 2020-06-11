@@ -1,6 +1,10 @@
-import pytest
+import pytest, os, json
 from bitarray import bitarray
 from nomad_dos_fingerprints import tanimoto_similarity, DOSFingerprint
+from nomad_dos_fingerprints.DOSfingerprint import ELECTRON_CHARGE
+
+with open(os.path.join(os.path.dirname(__file__), 'fingerprint_generation_test_data.json'), 'r') as test_data_file:
+    test_data = json.load(test_data_file)
 
 def test_tanimoto():
     # generate fp-type data and check if this can be realized with binary-strings only
@@ -16,3 +20,13 @@ def test_tanimoto():
     assert tanimoto_similarity(fp1, fp2) == 1
     assert tanimoto_similarity(fp1, fp1) == 1
     assert tanimoto_similarity(fp2, fp2) == 1
+
+def test_matching_of_spectra():
+    data = test_data["17661:2634879"]
+    cut_energies = []
+    cut_dos = []
+    cut_energies = [e for e,d in zip(data['dos_energies'], data['dos_values'][0]) if (e / ELECTRON_CHARGE > -4 and e / ELECTRON_CHARGE < 2)]
+    cut_dos = [d for e,d in zip(data['dos_energies'], data['dos_values'][0]) if (e / ELECTRON_CHARGE > -4 and e / ELECTRON_CHARGE < 2)]
+    fp = DOSFingerprint().calculate(data['dos_energies'], data['dos_values'])
+    cut_fp = DOSFingerprint().calculate(cut_energies, [cut_dos])
+    assert tanimoto_similarity(fp, cut_fp) == 1

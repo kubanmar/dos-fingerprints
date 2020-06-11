@@ -29,6 +29,8 @@ class DOSFingerprint():
         """
         Performs stepwise numerical integration of ``ys`` over the range of ``xs``. The stepsize of the generated histogram is controlled by DOSFingerprint().stepsize.
         """
+        if len(xs) < 2 or len(ys) < 2:
+            raise ValueError('Invalid input. Please provide arrays with len > 2.')
         xstart = round(int(xs[0] / (self.stepsize * 1.)) * self.stepsize, 8)  # define the limits that fit with the predefined stepsize
         xstop = round(int(xs[-1] / (self.stepsize * 1.)) * self.stepsize, 8)
         x_interp = np.arange(xstart, xstop + self.stepsize, self.stepsize)
