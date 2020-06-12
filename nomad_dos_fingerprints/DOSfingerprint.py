@@ -44,8 +44,8 @@ class DOSFingerprint():
         xstart = round(int(xs[0] / (self.stepsize * 1.)) * self.stepsize, 8)  # define the limits that fit with the predefined stepsize
         xstop = round(int(xs[-1] / (self.stepsize * 1.)) * self.stepsize, 8)
         x_interp = np.arange(xstart, xstop + self.stepsize, self.stepsize)
+        x_interp = np.around(x_interp, decimals=5)
         y_interp = np.interp(x_interp, xs, ys)
-        y_integ = []
         y_integ = np.array([np.trapz(y_interp[idx:idx + 2], x_interp[idx:idx + 2]) for idx in range(len(x_interp)-1)])
         return x_interp[:-1], y_integ
 
