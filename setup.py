@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="nomadDOSfingerprints",
-    version="0.1",
+    version="1.0",
     author="Martin Kuban",
     author_email="kuban@physik.hu-berlin.de",
     description="An implementation of DOS fingerprints for the NOMAD Laboratory.",
