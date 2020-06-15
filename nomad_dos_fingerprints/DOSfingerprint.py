@@ -14,10 +14,10 @@ class DOSFingerprint():
         self.filling_factor = 0
         self.grid_id = None
 
-    def calculate(self, dos_energies, dos_values):
+    def calculate(self, dos_energies, dos_values, grid_id = 'dg_cut:56:-2:7:(-10, 5)'):
         energy, dos = self._convert_dos(dos_energies, dos_values)
         raw_energies, raw_dos = self._integrate_to_bins(energy, dos)
-        grid = Grid().create()
+        grid = Grid().create(grid_id = grid_id)
         self.grid_id = grid.get_grid_id()
         self.indices, self.bins = self._calculate_bytes(raw_energies, raw_dos, grid)
         return self
