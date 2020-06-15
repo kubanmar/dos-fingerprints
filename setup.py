@@ -11,7 +11,7 @@ setuptools.setup(
     description="An implementation of DOS fingerprints for the NOMAD Laboratory.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://git.physik.hu-berlin.de/kuban/nomad-dos-fingerprints",
-    install_requires = ['numpy', 'bitarray'],
+    url="https://gitlab.mpcdf.mpg.de/nomad-lab/nomad-dos-fingerprints",
+    install_requires=['numpy', 'bitarray'],
     packages=['nomad_dos_fingerprints']
 )
