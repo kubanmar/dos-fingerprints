@@ -17,7 +17,7 @@ def plot_FP_in_grid(byte_fingerprint, grid, show = True, label = '', axes = None
         else:
             width=abs(item[0]-plotgrid[index-1][0])
         for idx, dos_value in enumerate(item[1]):
-            if bin_fp[bit_position]==1 and (bin_fp[bit_position+1] == 0 or idx == len(item[1])-1):
+            if bin_fp[bit_position]==1 and (idx == len(item[1])-1 or bin_fp[bit_position+1] == 0 ):
                 x.append(item[0])
                 y.append(dos_value)
                 all_width.append(width)
