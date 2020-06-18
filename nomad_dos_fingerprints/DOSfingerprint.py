@@ -14,8 +14,8 @@ class DOSFingerprint():
         self.filling_factor = 0
         self.grid_id = None
 
-    def calculate(self, dos_energies, dos_values, grid_id = 'dg_cut:56:-2:7:(-10, 5)'):
-        energy, dos = self._convert_dos(dos_energies, dos_values)
+    def calculate(self, dos_energies, dos_values, grid_id = 'dg_cut:56:-2:7:(-10, 5)', unit_cell_volume = 1, n_atoms = 1):
+        energy, dos = self._convert_dos(dos_energies, dos_values, unit_cell_volume = unit_cell_volume, n_atoms = n_atoms)
         raw_energies, raw_dos = self._integrate_to_bins(energy, dos)
         grid = Grid().create(grid_id = grid_id)
         self.grid_id = grid.get_grid_id()
@@ -49,13 +49,13 @@ class DOSFingerprint():
         y_integ = np.array([np.trapz(y_interp[idx:idx + 2], x_interp[idx:idx + 2]) for idx in range(len(x_interp)-1)])
         return x_interp[:-1], y_integ
 
-    def _convert_dos(self, energy, dos):
+    def _convert_dos(self, energy, dos, unit_cell_volume = 1, n_atoms = 1):
         """
         Convert units of DOS from energy: Joule; dos: states/volume/Joule to eV and sum spin channels if they are present.
         """
         energy = np.array([value / ELECTRON_CHARGE for value in energy])
         dos_channels = [np.array(values) for values in dos]
-        dos = sum(dos_channels) * ELECTRON_CHARGE
+        dos = sum(dos_channels) * ELECTRON_CHARGE * unit_cell_volume * n_atoms
         return energy, dos
     
     def _binary_bin(self, dos_value, grid_bins):
