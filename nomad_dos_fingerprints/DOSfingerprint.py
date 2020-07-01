@@ -1,18 +1,21 @@
 import numpy as np
 from bitarray import bitarray
+from functools import partial
 
 from .grid import Grid
+from .similarity import tanimoto_similarity
 
 ELECTRON_CHARGE = 1.602176565e-19
 
 class DOSFingerprint():
 
-    def __init__(self, stepsize = 0.05):
+    def __init__(self, stepsize = 0.05, similarity_function = tanimoto_similarity, **kwargs):
         self.bins = ''
         self.indices = []
         self.stepsize = stepsize
         self.filling_factor = 0
         self.grid_id = None
+        self.set_similarity_function(similarity_function, **kwargs)
 
     def calculate(self, dos_energies, dos_values, grid_id = 'dg_cut:56:-2:7:(-10, 5)', unit_cell_volume = 1, n_atoms = 1):
         energy, dos = self._convert_dos(dos_energies, dos_values, unit_cell_volume = unit_cell_volume, n_atoms = n_atoms)
@@ -34,6 +37,15 @@ class DOSFingerprint():
         self.grid_id = fp_dict['grid_id']
         self.filling_factor = fp_dict['filling_factor']
         return self
+
+    def set_similarity_function(self, similarity_function, **kwargs):
+        self.similarity_function = partial(similarity_function, **kwargs)
+
+    def get_similarity(self, fingerprint):
+        return self.similarity_function(self, fingerprint)
+
+    def get_similarities(self, list_of_fingerprints):
+        return np.array([self.similarity_function(self, fp) for fp in list_of_fingerprints])
 
     def _integrate_to_bins(self, xs, ys):
         """
@@ -57,7 +69,7 @@ class DOSFingerprint():
         dos_channels = [np.array(values) for values in dos]
         dos = sum(dos_channels) * ELECTRON_CHARGE * unit_cell_volume * n_atoms
         return energy, dos
-    
+
     def _binary_bin(self, dos_value, grid_bins):
         bin_dos = ''
         for grid_bin in grid_bins:

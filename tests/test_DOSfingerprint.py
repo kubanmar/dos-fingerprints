@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 
 from nomad_dos_fingerprints import DOSFingerprint, tanimoto_similarity
-from nomad_dos_fingerprints.DOSfingerprint import ELECTRON_CHARGE 
+from nomad_dos_fingerprints.DOSfingerprint import ELECTRON_CHARGE
 
 def test_integrate_to_bins():
     test_data_x = np.linspace(0, np.pi, num = 1000)
