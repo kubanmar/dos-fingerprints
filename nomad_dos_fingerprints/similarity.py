@@ -25,4 +25,8 @@ def tanimoto_similarity(fingerprint1, fingerprint2):
     a = fp1.count()
     b = fp2.count()
     c = (fp1 & fp2).count()
-    return c / float(a + b - c)
+    try:
+        tc = c / float(a + b - c)
+    except ZeroDivisionError:
+        tc = 0
+    return tc
