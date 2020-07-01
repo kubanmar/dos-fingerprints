@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="nomadDOSfingerprints",
+    name="nomad_dos_fingerprints",
     version="1.0",
     author="Martin Kuban",
     author_email="kuban@physik.hu-berlin.de",
