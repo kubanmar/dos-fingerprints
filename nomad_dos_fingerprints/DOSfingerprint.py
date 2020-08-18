@@ -47,6 +47,9 @@ class DOSFingerprint():
     def get_similarities(self, list_of_fingerprints):
         return np.array([self.similarity_function(self, fp) for fp in list_of_fingerprints])
 
+    def __eq__(self, other):
+        return self.bins == other.bins and self.indices == other.indices and self.stepsize == other.stepsize and self.grid_id == other.grid_id and self.filling_factor == other.filling_factor
+
     def _integrate_to_bins(self, xs, ys):
         """
         Performs stepwise numerical integration of ``ys`` over the range of ``xs``. The stepsize of the generated histogram is controlled by DOSFingerprint().stepsize.
