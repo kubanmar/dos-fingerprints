@@ -27,6 +27,8 @@ class Grid():
         return {'grid_type' : grid_type, 'num_bins' : int(num_bins), 'mu' : float(mu), 'sigma' : float(sigma), 'cutoff' : tuple([float(x) for x in cutoff[1:-1].split(',')])}
 
     def grid(self):
+        if self.grid_type != 'dg_cut':
+            raise NotImplementedError('Currently, only the grid dg_cut is implemented.')
         asc = 0
         desc = 0
         x_grid = [0]
