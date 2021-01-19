@@ -3,7 +3,7 @@ import numpy as np
 class Grid():
     
     @staticmethod
-    def create(grid_id = None, grid_type = 'dg_cut', mu = -2, sigma = 7, cutoff = (-10,5), num_bins = 56, original_stepsize = 0.05):
+    def create(grid_id = None, grid_type = 'dg_cut', mu = -2, sigma = 7, cutoff = (-10,5), num_bins = 56, original_stepsize = 0.05, bin_size_factor = 56):
         if grid_id == None:
             self = Grid()
             self.grid_type = grid_type
@@ -13,6 +13,7 @@ class Grid():
             self.num_bins = num_bins
             self.original_stepsize = original_stepsize
             self.grid_id = self.get_grid_id()
+            self.bin_size_factor = bin_size_factor
         else:
             self = Grid().create(**Grid().resolve_grid_id(grid_id))
         return self
@@ -23,8 +24,15 @@ class Grid():
 
     @staticmethod
     def resolve_grid_id(grid_id):
-        grid_type, num_bins, mu, sigma, cutoff = grid_id.split(':')
-        return {'grid_type' : grid_type, 'num_bins' : int(num_bins), 'mu' : float(mu), 'sigma' : float(sigma), 'cutoff' : tuple([float(x) for x in cutoff[1:-1].split(',')])}
+        grid_id_variables = grid_id.split(':')
+        if len(grid_id_variables) == 5: # Downwards compatibility
+            grid_type, num_bins, mu, sigma, cutoff = grid_id_variables
+            bin_size_factor = num_bins
+        elif len(grid_id_variables) == 6:
+            grid_type, num_bins, mu, sigma, cutoff, bin_size_factor = grid_id_variables
+        else:
+            raise ValueError('Grid id can not be interpreted.')
+        return {'grid_type' : grid_type, 'num_bins' : int(num_bins), 'mu' : float(mu), 'sigma' : float(sigma), 'cutoff' : tuple([float(x) for x in cutoff[1:-1].split(',')]), 'bin_size_factor' : float(bin_size_factor)}
 
     def grid(self):
         if self.grid_type != 'dg_cut':
@@ -46,7 +54,7 @@ class Grid():
         grid = []
         for item in x_grid:
             bins = []
-            bin_height = self._step_sequencer(item, self.mu, self.sigma, original_stepsize=0.1) / (self.num_bins * 2.)
+            bin_height = self._step_sequencer(item, self.mu, self.sigma, original_stepsize=0.1) / (self.bin_size_factor * 2.)
             for idx in range(1, self.num_bins + 1):
                 bins.append(bin_height * idx)
             grid.append([item, bins])

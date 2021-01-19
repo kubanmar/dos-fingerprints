@@ -18,3 +18,4 @@ def test_generate_grid_from_id():
     grid = Grid().create()
     grid_ids = Grid().create(grid_id = 'dg_cut:56:-2:7:(-10, 5)')
     assert grid.grid() == grid_ids.grid()
+    
