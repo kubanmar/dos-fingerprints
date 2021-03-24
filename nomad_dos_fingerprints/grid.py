@@ -12,14 +12,14 @@ class Grid():
             self.cutoff = cutoff
             self.num_bins = num_bins
             self.original_stepsize = original_stepsize
-            self.grid_id = self.get_grid_id()
             self.bin_size_factor = bin_size_factor
+            self.grid_id = self.get_grid_id()
         else:
-            self = Grid().create(**Grid().resolve_grid_id(grid_id))
+            self = Grid.create(**Grid.resolve_grid_id(grid_id))
         return self
 
     def get_grid_id(self):
-        id = ':'.join([self.grid_type, str(self.num_bins), str(self.mu), str(self.sigma), str(self.cutoff)])
+        id = ':'.join([self.grid_type, str(self.num_bins), str(self.mu), str(self.sigma), str(self.cutoff), str(self.bin_size_factor)])
         return id
 
     @staticmethod
@@ -59,6 +59,19 @@ class Grid():
                 bins.append(bin_height * idx)
             grid.append([item, bins])
         return grid
+
+    def get_grid_indices_for_energy_range(self, energy):
+        grid_energies = [x[0] for x in self.grid()]
+        energy = [e for e in energy if (e >= grid_energies[0] and e <= grid_energies[-1])]
+        for idx, grid_e in enumerate(grid_energies):
+            if grid_e > energy[0]:
+                grid_start = idx - 1 if idx - 1 >= 0 else 0
+                break
+        for idx, grid_e in reversed(list(enumerate(grid_energies))):
+            if grid_e < energy[-1]:
+                grid_end = idx + 1 if idx + 1 <= len(grid_energies) else len(grid_energies)
+                break
+        return grid_start, grid_end
 
     def _gauss(self, x, mu, sigma, normalized=True):
         coefficient = (np.sqrt(2 * np.pi) * sigma)
