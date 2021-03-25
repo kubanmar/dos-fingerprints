@@ -29,15 +29,16 @@ def test_get_grid_indices_for_energy_range():
 
     #creates the correct indices if energies are larger than grid
     min_index, max_index =  get_indices_from_energy_limits(grid, -10,10)
-    assert grid_array[min_index][0] == min([x[0] for x in grid_array])
-    assert grid_array[max_index][0] == max([x[0] for x in grid_array])
+    assert (grid_array[min_index][0] >= -5) and (grid_array[min_index-1][0] < -5)
+    assert (grid_array[max_index][0] <= 5) and  (grid_array[max_index+1][0] > 5)
 
     #creates the correct indices if energies are smaller than grid
     min_index, max_index =  get_indices_from_energy_limits(grid, -4, 2)
-    assert (grid_array[min_index][0] <= -4) and (grid_array[min_index+1][0] > -4)
-    assert (grid_array[max_index][0] >= 2) and  (grid_array[max_index-1][0] < 2)
+    assert (grid_array[min_index][0] >= -4) and (grid_array[min_index+1][0] > -4) and (grid_array[min_index-1][0] < -4)
+    assert (grid_array[max_index][0] >= 2) and  (grid_array[max_index-1][0] < 2) and (grid_array[max_index+1][0] > 2)
 
     #creates the correct indices if energies match grid
-    min_index, max_index =  get_indices_from_energy_limits(grid, -5, 5)
-    assert (grid_array[min_index][0] <= -5) and (grid_array[min_index+1][0] > -5)
-    assert (grid_array[max_index][0] >= 5) and  (grid_array[max_index-1][0] < 5)
+    min_index, max_index =  get_indices_from_energy_limits(grid, -2, 2)
+    grid = Grid().create(cutoff=(-2,2))
+    assert (grid_array[min_index][0] <= -2) and (grid_array[min_index+1][0] > -2)
+    assert (grid_array[max_index][0] >= 2) and  (grid_array[max_index-1][0] < 2)

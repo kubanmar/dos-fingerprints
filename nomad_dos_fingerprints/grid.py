@@ -64,12 +64,12 @@ class Grid():
         grid_energies = [x[0] for x in self.grid()]
         energy = [e for e in energy if (e >= grid_energies[0] and e <= grid_energies[-1])]
         for idx, grid_e in enumerate(grid_energies):
-            if grid_e > energy[0]:
-                grid_start = idx - 1 if idx - 1 >= 0 else 0
+            if grid_e >= energy[0]:
+                grid_start = idx if idx >= 0 else 0
                 break
         for idx, grid_e in reversed(list(enumerate(grid_energies))):
-            if grid_e < energy[-1]:
-                grid_end = idx + 1 if idx + 1 <= len(grid_energies) else len(grid_energies)
+            if grid_e <= energy[-1]:
+                grid_end = idx if idx <= len(grid_energies) else len(grid_energies)
                 break
         return grid_start, grid_end
 
