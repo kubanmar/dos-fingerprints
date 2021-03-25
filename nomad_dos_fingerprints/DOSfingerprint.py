@@ -90,20 +90,31 @@ class DOSFingerprint():
                 bin_dos += '0'
         return bin_dos
 
-    def _adapt_energy_bin_sizes(self, energy_bins: np.ndarray, states: np.ndarray, grid_array: list):
+    def _adapt_energy_bin_sizes(self, energy_bins: np.ndarray, states: np.ndarray):
         """
         Adapt energy bin sizes to the specified values in the grid.
         Args:
             energy_bins: numpy.ndarray: locations of energy bins
             states: numpy.ndarray: states in the bins declared in `energy_bins`
-            grid_array: list: discretisation of a Grid()-object
         Returns:
             None
         """
+        grid = Grid.create(grid_id = self.grid_id)
+        grid_array = grid.grid()
         # cut the energy and states to grid size
         energy_bins, states = np.transpose([(e,d) for e,d in zip(energy_bins, states) if (e >= grid_array[0][0] and e <= grid_array[-1][0])])
         # find grid start and end points
-        
+        grid_start, grid_end = grid.get_grid_indices_for_energy_range(energy_bins)
+        # sum dos bins to adapt to inhomogeneous energy grid
+        adapted_bins = []
+        adapted_states = []
+        for index in range(grid_start, grid_end):
+            eps_i = grid_array[index][0]
+            eps_iplusdelta = grid_array[index+1][0]
+            adapted_bins.append(eps_i)
+            adapted_states.append(sum(np.array([s for e, s in zip(energy_bins, states) if e >= eps_i and e < eps_iplusdelta])))
+        return adapted_bins, adapted_states
+
 
 
     def _calculate_bytes(self, energy, dos, grid, return_binned_dos = False):

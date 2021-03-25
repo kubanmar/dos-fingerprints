@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 
-from nomad_dos_fingerprints import DOSFingerprint, tanimoto_similarity
+from nomad_dos_fingerprints import DOSFingerprint, tanimoto_similarity, Grid
 from nomad_dos_fingerprints.DOSfingerprint import ELECTRON_CHARGE
 
 def test_integrate_to_bins():
@@ -37,3 +37,15 @@ def test_serialization():
     fp_json = fp.to_dict()
     fp_again = DOSFingerprint().from_dict(fp_json)
     assert tanimoto_similarity(fp, fp_again) == 1
+
+def test_adapt_energy_bin_sizes():
+    dummy_energy = np.arange(-10,5.1,0.1)
+    dummy_dos = np.ones(len(dummy_energy))
+    fp = DOSFingerprint()   
+    e, d = fp._adapt_energy_bin_sizes(dummy_energy, dummy_dos)
+    grid = Grid.create(grid_id = fp.grid_id)
+    grid_ids = grid.get_grid_indices_for_energy_range(e)
+    assert e[0] == grid.grid()[grid_ids[0]][0]
+    assert e[-1] == grid.grid()[grid_ids[1]][0]
+    assert d == [0.45, 0.4, 0.4, 0.35, 0.3, 0.3, 0.25, 0.25, 0.25, 0.2, 0.2, 0.2, 0.2, 0.15, 0.15, 0.15, 0.15, 0.15, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.15, 0.15, 0.15, 0.15, 0.15, 0.2, 0.2, 0.2, 0.2, 0.25, 0.25, 0.25, 0.3, 0.3]
+    ## Instead of hardcoding that, find a functional relationship and do the thing properly
