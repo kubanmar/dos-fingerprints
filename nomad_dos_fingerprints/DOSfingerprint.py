@@ -97,7 +97,8 @@ class DOSFingerprint():
             energy_bins: numpy.ndarray: locations of energy bins
             states: numpy.ndarray: states in the bins declared in `energy_bins`
         Returns:
-            None
+            adapted_bins: list: new energy discretization steps
+            adapted_states: list: state bins with adapted discretization steps
         """
         grid = Grid.create(grid_id = self.grid_id)
         grid_array = grid.grid()
