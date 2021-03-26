@@ -116,7 +116,6 @@ class DOSFingerprint():
         return adapted_bins, adapted_states
 
 
-
     def _calculate_bytes(self, energy, dos, grid, return_binned_dos = False):
         """
         Calculate the byte fingerprint.

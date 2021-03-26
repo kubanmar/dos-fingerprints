@@ -39,13 +39,18 @@ def test_serialization():
     assert tanimoto_similarity(fp, fp_again) == 1
 
 def test_adapt_energy_bin_sizes():
-    dummy_energy = np.arange(-10,5.1,0.1)
-    dummy_dos = np.ones(len(dummy_energy))
     fp = DOSFingerprint()   
+    dummy_energy, dummy_dos = fp._integrate_to_bins(np.arange(-10,6,1), np.ones(16)) 
     e, d = fp._adapt_energy_bin_sizes(dummy_energy, dummy_dos)
     grid = Grid.create(grid_id = fp.grid_id)
-    grid_ids = grid.get_grid_indices_for_energy_range(e)
-    assert e[0] == grid.grid()[grid_ids[0]][0]
-    assert e[-1] == grid.grid()[grid_ids[1]][0]
-    assert d == [0.45, 0.4, 0.4, 0.35, 0.3, 0.3, 0.25, 0.25, 0.25, 0.2, 0.2, 0.2, 0.2, 0.15, 0.15, 0.15, 0.15, 0.15, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.15, 0.15, 0.15, 0.15, 0.15, 0.2, 0.2, 0.2, 0.2, 0.25, 0.25, 0.25, 0.3, 0.3]
-    ## Instead of hardcoding that, find a functional relationship and do the thing properly
+    grid_start, grid_end = grid.get_grid_indices_for_energy_range(dummy_energy)
+    grid_array = grid.grid()
+    # energy grid points are the same as in the Grid
+    assert e[0] == grid_array[grid_start][0]
+    assert e[-1] == grid_array[grid_end-1][0] # the last grid energy is the final border
+    # the test case is integrated correctly
+    cut_grid_array = grid_array[grid_start:grid_end+1] # +1: inclusion of the last point for "manual" integration below
+    reference = [(cut_grid_array[idx+1][0] - cut_grid_array[idx][0]) for idx in range(len(cut_grid_array) -1)] 
+    assert np.allclose(d, reference)
+    # misc
+    assert (grid_start, grid_end - 1) == grid.get_grid_indices_for_energy_range([np.round(x, 5) for x in e]) # e is 1 block shorter due to summation
