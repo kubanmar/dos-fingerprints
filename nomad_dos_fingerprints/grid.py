@@ -69,7 +69,7 @@ class Grid():
                 break
         for idx, grid_e in reversed(list(enumerate(grid_energies))):
             if grid_e <= energy[-1]:
-                grid_end = idx if idx <= len(grid_energies) else len(grid_energies)
+                grid_end = idx if idx <= len(grid_energies) - 1 else len(grid_energies) - 1 # last index is len(list_) - 1 
                 break
         return grid_start, grid_end
 
