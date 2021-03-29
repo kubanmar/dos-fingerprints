@@ -148,6 +148,7 @@ class DOSFingerprint():
         for states, grid_segment in zip(adapted_states, grid_array[grid_start:grid_end + 1]):
             bin_fp += self._binary_bin(states, grid_segment[1])
             overflow += self._get_segment_overflow(states, grid_segment)
+        self.overflow = overflow
         return bin_fp
 
     def _calculate_byte_representation(self, bin_fp: str):
@@ -173,6 +174,6 @@ class DOSFingerprint():
         Returns:
             segment_overflow: float: number of states that can be described by the grid segment
         """
-        delta_states = grid_segment[1][-1] - states
+        delta_states = states - grid_segment[1][-1] 
         segment_overflow = delta_states if delta_states >= 0 else 0
         return  segment_overflow
