@@ -64,7 +64,7 @@ class DOSFingerprint():
         Performs stepwise numerical integration of ``ys`` over the range of ``xs``. The stepsize of the generated histogram is controlled by DOSFingerprint().stepsize.
         """
         if len(xs) < 2 or len(ys) < 2:
-            raise ValueError(f'Invalid input. Please provide arrays with len > 2. \n{xs}\n{ys}')
+            raise ValueError(f'Invalid input. Please provide arrays with len > 2. len(x) : {len(xs)} len(y) : {len(ys)}')
         xstart = round(int(xs[0] / (self.stepsize * 1.)) * self.stepsize, 8)  # define the limits that fit with the predefined stepsize
         xstop = round(int(xs[-1] / (self.stepsize * 1.)) * self.stepsize, 8)
         x_interp = np.arange(xstart, xstop + self.stepsize, self.stepsize)
@@ -136,14 +136,18 @@ class DOSFingerprint():
         Args:
             adapted_states: numpy.ndarray: states in the bins declared in `energy_bins`
             grid: Grid: description of the DOS discretization
+        Sets:
+            overflow: float: number of states that can not be described by the current grid
         Returns: 
             discrete_states: str: binary representation of binned DOS spectrum
         """
         bin_fp = ''
         grid_array = grid.grid()
         grid_start, grid_end = self.indices
+        overflow = 0
         for states, grid_segment in zip(adapted_states, grid_array[grid_start:grid_end + 1]):
             bin_fp += self._binary_bin(states, grid_segment[1])
+            overflow += self._get_segment_overflow(states, grid_segment)
         return bin_fp
 
     def _calculate_byte_representation(self, bin_fp: str):
@@ -157,39 +161,18 @@ class DOSFingerprint():
         """
         _, adapted_states = self._adapt_energy_bin_sizes(binned_energies, binned_states, grid)
         bin_fp = self._calc_bit_vector(adapted_states, grid)
+        self.filling_factor = bin_fp.count('1') / len(bin_fp)
         return bin_fp
 
-    def _calculate_bytes2(self, energy, dos, grid, return_binned_dos = False):
+    def _get_segment_overflow(self, states, grid_segment):
         """
-        Calculate the byte fingerprint.
+        Calculate the number of states that lies beyond the region described by a grid segment.
+        Args:
+            states: float: states in the bins declared in `energy_bins`
+            grid_segment: Grid: description of the DOS discretization
+        Returns:
+            segment_overflow: float: number of states that can be described by the grid segment
         """
-        grid_array = grid.grid()
-        # cut the energy and dos to grid size
-        energy, dos = np.transpose([(e,d) for e,d in zip(energy, dos) if (e >= grid_array[0][0] and e <= grid_array[-1][0])])
-        # calculate fingerprint
-        bin_fp = ''
-        grid_index = 0
-        for idx, grid_e in enumerate(grid_array):
-            if grid_e[0] > energy[0]:
-                grid_index = idx - 1
-                if grid_index < 0:
-                    grid_index = 0
-                break
-        grid_start = grid_index
-        fp_index = 0
-        binned_dos = []
-        grid_bins = []
-        while grid_array[grid_index + 1][0] < energy[-1]:
-            current_dos = 0
-            while energy[fp_index] < grid_array[grid_index + 1][0]:
-                current_dos += dos[fp_index]
-                fp_index += 1
-            binned_dos.append(current_dos)
-            grid_bins.append(grid_array[grid_index][0])
-            bin_fp += self._binary_bin(current_dos, grid_array[grid_index][1])
-            grid_index += 1
-        self.filling_factor = bin_fp.count('1') / len(bin_fp)
-        byte_fp = bitarray(bin_fp).tobytes().hex()
-        if return_binned_dos:
-            return [grid_start, grid_index], byte_fp, [grid_bins, binned_dos]
-        return [grid_start, grid_index], byte_fp
+        delta_states = grid_segment[1][-1] - states
+        segment_overflow = delta_states if delta_states >= 0 else 0
+        return  segment_overflow
