@@ -29,8 +29,9 @@ class DOSFingerprint():
             raise ValueError('Key-word argument ´convert_data´ must be either the string "Enc", a callable or None.')
         raw_energies, raw_dos = self._integrate_to_bins(energy, dos)
         grid = Grid.create(grid_id = grid_id)
-        self.grid_id = grid.get_grid_id()
-        self.indices, self.bins = self._calculate_bytes(raw_energies, raw_dos, grid)
+        self.grid_id = grid_id if grid_id != None else grid.get_grid_id()
+        bin_fp = self._calculate_bit_fingerprint(raw_energies, raw_dos, grid)
+        self.bins = self._calculate_byte_representation(bin_fp)
         return self
 
     def to_dict(self):
@@ -81,7 +82,7 @@ class DOSFingerprint():
         dos = sum(dos_channels) * ELECTRON_CHARGE * unit_cell_volume * n_atoms
         return energy, dos
 
-    def _binary_bin(self, dos_value, grid_bins):
+    def _binary_bin(self, dos_value: float, grid_bins: np.ndarray):
         bin_dos = ''
         for grid_bin in grid_bins:
             if grid_bin <= dos_value:
@@ -90,22 +91,35 @@ class DOSFingerprint():
                 bin_dos += '0'
         return bin_dos
 
-    def _adapt_energy_bin_sizes(self, energy_bins: np.ndarray, states: np.ndarray):
+    def _calc_grid_indices(self, energy_bins: np.ndarray, grid: Grid):
+        """
+        Calculate indices of the DOS grid that describe the energy range where the DOS is defined.
+        Args:
+            energy_bins: np.ndarray: energy bins cut to be no larger than the Grid range
+            grid: Grid: description of the DOS discretization
+        Return:
+            self.indices: list: Grid indices that indicate which parts of the Grid are no larger than the energy bins
+        """
+        grid_start, grid_end = grid.get_grid_indices_for_energy_range(energy_bins)
+        self.indices = [grid_start, grid_end]
+        return self.indices
+        
+    def _adapt_energy_bin_sizes(self, energy_bins: np.ndarray, states: np.ndarray, grid: Grid):
         """
         Adapt energy bin sizes to the specified values in the grid.
         Args:
             energy_bins: numpy.ndarray: locations of energy bins
             states: numpy.ndarray: states in the bins declared in `energy_bins`
+            grid: Grid: description of the DOS discretization
         Returns:
             adapted_bins: list: new energy discretization steps
             adapted_states: list: state bins with adapted discretization steps
         """
-        grid = Grid.create(grid_id = self.grid_id)
         grid_array = grid.grid()
         # cut the energy and states to grid size
         energy_bins, states = np.transpose([(e,d) for e,d in zip(energy_bins, states) if (e >= grid_array[0][0] and e <= grid_array[-1][0])])
         # find grid start and end points
-        grid_start, grid_end = grid.get_grid_indices_for_energy_range(energy_bins)
+        grid_start, grid_end = self._calc_grid_indices(energy_bins, grid)
         # sum dos bins to adapt to inhomogeneous energy grid
         adapted_bins = []
         adapted_states = []
@@ -116,8 +130,36 @@ class DOSFingerprint():
             adapted_states.append(sum(np.array([s for e, s in zip(energy_bins, states) if e >= eps_i and e < eps_iplusdelta])))
         return adapted_bins, adapted_states
 
+    def _calc_bit_vector(self, adapted_states: np.ndarray, grid: Grid):
+        """
+        Calculate bit representation of grid-adapted states per energy bin.
+        Args:
+            adapted_states: numpy.ndarray: states in the bins declared in `energy_bins`
+            grid: Grid: description of the DOS discretization
+        Returns: 
+            discrete_states: str: binary representation of binned DOS spectrum
+        """
+        bin_fp = ''
+        grid_array = grid.grid()
+        grid_start, grid_end = self.indices
+        for states, grid_segment in zip(adapted_states, grid_array[grid_start:grid_end + 1]):
+            bin_fp += self._binary_bin(states, grid_segment[1])
+        return bin_fp
 
-    def _calculate_bytes(self, energy, dos, grid, return_binned_dos = False):
+    def _calculate_byte_representation(self, bin_fp: str):
+        byte_fp = bitarray(bin_fp).tobytes().hex()
+        return byte_fp
+
+
+    def _calculate_bit_fingerprint(self, binned_energies: np.ndarray, binned_states: np.ndarray, grid: Grid):
+        """
+        Calculate byte representation of DOS fingerprint.
+        """
+        _, adapted_states = self._adapt_energy_bin_sizes(binned_energies, binned_states, grid)
+        bin_fp = self._calc_bit_vector(adapted_states, grid)
+        return bin_fp
+
+    def _calculate_bytes2(self, energy, dos, grid, return_binned_dos = False):
         """
         Calculate the byte fingerprint.
         """

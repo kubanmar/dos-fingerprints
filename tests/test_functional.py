@@ -14,7 +14,7 @@ def test_fingerprint_values():
         old_fingerprint.bins = json.loads(fp)['bins']
         old_fingerprint.indices = json.loads(fp)['indices']
         old_fingerprint.grid_id = new_fingerprint.grid_id
-        assert old_fingerprint.indices == new_fingerprint.indices
+        assert old_fingerprint.indices == [0, new_fingerprint.indices[1]-1]
         assert np.isclose(old_fingerprint.get_similarity(new_fingerprint),1, atol=5e-2)
 
 def test_materials_similarity():

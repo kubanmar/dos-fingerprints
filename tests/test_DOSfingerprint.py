@@ -41,7 +41,7 @@ def test_serialization():
 def test_adapt_energy_bin_sizes():
     fp = DOSFingerprint()   
     dummy_energy, dummy_dos = fp._integrate_to_bins(np.arange(-10,6,1), np.ones(16)) 
-    e, d = fp._adapt_energy_bin_sizes(dummy_energy, dummy_dos)
+    e, d = fp._adapt_energy_bin_sizes(dummy_energy, dummy_dos, Grid.create(grid_id = fp.grid_id))
     grid = Grid.create(grid_id = fp.grid_id)
     grid_start, grid_end = grid.get_grid_indices_for_energy_range(dummy_energy)
     grid_array = grid.grid()
@@ -54,3 +54,23 @@ def test_adapt_energy_bin_sizes():
     assert np.allclose(d, reference)
     # misc
     assert (grid_start, grid_end - 1) == grid.get_grid_indices_for_energy_range([np.round(x, 5) for x in e]) # e is 1 block shorter due to summation
+
+def test_calc_grid_indices():
+    fp = DOSFingerprint()   
+    grid = Grid.create(grid_id = fp.grid_id)
+    dummy_energy, dummy_dos = fp._integrate_to_bins(np.arange(-10,6,1), np.ones(16)) 
+    e, _ = fp._adapt_energy_bin_sizes(dummy_energy, dummy_dos, Grid.create(grid_id = fp.grid_id))
+    indices = fp._calc_grid_indices(e, grid)
+    assert indices == fp.indices
+    assert indices == list(grid.get_grid_indices_for_energy_range(e))
+
+def test_calc_bit_vector():
+    grid = Grid.create()
+    fp = DOSFingerprint(grid_id = grid.get_grid_id())
+    grid_array = grid.grid()
+    fp.indices = [0, len(grid_array)-1]
+    all_ones = fp._calc_bit_vector([max(grid_column[1]) for grid_column in grid_array], grid)
+    assert all_ones == '1' * grid.num_bins * abs(fp.indices[1]+1 - fp.indices[0])
+    print(grid.num_bins/2 - 1) 
+    all_half_filled = fp._calc_bit_vector([grid_column[1][int(grid.num_bins/2 - 1)] for grid_column in grid_array], grid)
+    assert all_half_filled == ('1' * int(grid.num_bins / 2) + '0' * int(grid.num_bins / 2)) * abs(fp.indices[1]+1 - fp.indices[0]) 
