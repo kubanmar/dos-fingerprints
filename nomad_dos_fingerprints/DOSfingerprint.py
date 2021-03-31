@@ -62,13 +62,14 @@ class DOSFingerprint():
     def _integrate_to_bins(self, xs, ys):
         """
         Performs stepwise numerical integration of ``ys`` over the range of ``xs``. The stepsize of the generated histogram is controlled by DOSFingerprint().stepsize.
+        WARNING: Internally rounds the interpolation steps to 8 decimals.
         """
         if len(xs) < 2 or len(ys) < 2:
             raise ValueError(f'Invalid input. Please provide arrays with len > 2. len(x) : {len(xs)} len(y) : {len(ys)}')
         xstart = round(int(xs[0] / (self.stepsize * 1.)) * self.stepsize, 8)  # define the limits that fit with the predefined stepsize
         xstop = round(int(xs[-1] / (self.stepsize * 1.)) * self.stepsize, 8)
         x_interp = np.arange(xstart, xstop + self.stepsize, self.stepsize)
-        x_interp = np.around(x_interp, decimals=5)
+        x_interp = np.around(x_interp, decimals=8)
         y_interp = np.interp(x_interp, xs, ys)
         y_integ = np.array([np.trapz(y_interp[idx:idx + 2], x_interp[idx:idx + 2]) for idx in range(len(x_interp)-1)])
         return x_interp[:-1], y_integ
