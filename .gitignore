@@ -4,3 +4,4 @@
 run_tests.bat
 .vscode
 .coverage*
+.pytest_cache

@@ -4,6 +4,17 @@ class Grid():
     
     @staticmethod
     def create(grid_id = None, grid_type = 'dg_cut', mu = -2, sigma = 7, cutoff = (-10,5), num_bins = 56, original_stepsize = 0.05, bin_size_factor = 56):
+        """
+        Create grid object. 
+        There are two options to initialize the grid: 
+            1. Initialize from grid id: The grid id, which is a string that contains all grid parameters, is used to set the parameters of the grid.
+            2. Initialize from parameters: The grid is created directly from the parameters passed as key-word arguments.
+        
+        **Returns**
+
+        self: *Grid*
+            The grid object with set grid parameters.
+        """
         if grid_id == None:
             self = Grid()
             self.grid_type = grid_type
@@ -23,7 +34,7 @@ class Grid():
         return id
 
     @staticmethod
-    def resolve_grid_id(grid_id):
+    def resolve_grid_id(grid_id: str) -> dict:
         grid_id_variables = grid_id.split(':')
         if len(grid_id_variables) == 5: # Downwards compatibility
             grid_type, num_bins, mu, sigma, cutoff = grid_id_variables
@@ -34,7 +45,15 @@ class Grid():
             raise ValueError('Grid id can not be interpreted.')
         return {'grid_type' : grid_type, 'num_bins' : int(num_bins), 'mu' : float(mu), 'sigma' : float(sigma), 'cutoff' : tuple([float(x) for x in cutoff[1:-1].split(',')]), 'bin_size_factor' : float(bin_size_factor)}
 
-    def grid(self):
+    def grid(self) -> list:
+        """
+        Generate a grid with parameters set by `self.grid_id`.
+
+        **Returns**
+
+        grid: *list*
+            Nested list of type [[<grid_point_energy_i>, [<dos_bins_i>]], ...]
+        """
         if self.grid_type != 'dg_cut':
             raise NotImplementedError('Currently, only the grid dg_cut is implemented.')
         asc = 0
@@ -60,7 +79,37 @@ class Grid():
             grid.append([item, bins])
         return grid
 
-    def get_grid_indices_for_energy_range(self, energy):
+    def grid_from_lists(self, energies: list, max_heights: list, n_bins: int) -> list:
+        """
+        Generate a grid from lists of energies, maximal heights, and the number of bins.
+
+        **Arguments**
+
+        energies: *list*
+            List of energy boundaries, aligned at the negative edge of the energy interval for energy bin.
+
+        max_heights: *list*
+            List of maximal heights, defined for each energy boundary in `energies`.
+
+        n_bins: *int*
+            Number of bins that is used to discretise each energy interval.
+        
+        **Returns**
+
+        grid: *list*
+            Nested list of type [[<grid_point_energy_i>, [<dos_bin_ij>, ...]], ...]
+        """
+        # avoid unexpected behaviour
+        assert len(energies) == len(max_heights), "Number of energy intervals is not equal to the number of maximal heights for each energy."
+
+        # generate grid
+        grid = []
+        for energy, max_height in zip(energies, max_heights):
+            bin_height = max_height / n_bins
+            grid.append([energy, [idx * bin_height for idx in range(1, n_bins + 1)]])
+        return grid
+
+    def get_grid_indices_for_energy_range(self, energy: list) -> set:
         grid_energies = [x[0] for x in self.grid()]
         energy = [e for e in energy if (e >= grid_energies[0] and e <= grid_energies[-1])]
         for idx, grid_e in enumerate(grid_energies):

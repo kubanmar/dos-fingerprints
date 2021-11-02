@@ -3,6 +3,10 @@ import numpy as np
 
 from nomad_dos_fingerprints import Grid
 
+@pytest.fixture
+def grid():
+    return Grid()
+
 with open(os.path.join(os.path.dirname(__file__), 'grid_test.json'), 'r') as test_data_file:
     test_grid_data = json.load(test_data_file)
 
@@ -42,3 +46,14 @@ def test_get_grid_indices_for_energy_range():
     grid = Grid().create(cutoff=(-2,2))
     assert (grid_array[min_index][0] <= -2) and (grid_array[min_index+1][0] > -2)
     assert (grid_array[max_index][0] >= 2) and  (grid_array[max_index-1][0] < 2)
+
+def test_grid_from_lists(grid):
+
+    expected_grid = [
+        [1, [0.5, 1.0, 1.5, 2.0]],
+        [2, [1.0, 2.0, 3.0, 4.0]],
+        [3, [2.0, 4.0, 6.0, 8.0]]
+    ]
+
+    list_grid = grid.grid_from_lists([1,2,3], [2,4,8], 4)
+    assert list_grid == expected_grid, "Got wrong grid from list"
