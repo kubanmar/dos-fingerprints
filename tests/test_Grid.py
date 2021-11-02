@@ -57,3 +57,14 @@ def test_grid_from_lists(grid):
 
     list_grid = grid.grid_from_lists([1,2,3], [2,4,8], 4)
     assert list_grid == expected_grid, "Got wrong grid from list"
+
+def test_energy_intervals_from_function(grid):
+
+    def test_function(value: float):
+        return int(value)
+
+    expected_output = [
+        -5, -2, -1, 0, 1, 2, 5
+    ]
+    
+    assert grid.energy_intervals_from_function(test_function, 1, [-10,10]) == expected_output, "Wrong energy intervals calculated"

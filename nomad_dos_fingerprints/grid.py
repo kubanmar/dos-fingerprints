@@ -1,4 +1,7 @@
+from typing import Callable, List
 import numpy as np
+from numpy.core.fromnumeric import sort
+from numpy.core.numeric import full
 
 class Grid():
     
@@ -121,6 +124,56 @@ class Grid():
                 grid_end = idx if idx <= len(grid_energies) - 1 else len(grid_energies) - 1 # last index is len(list_) - 1 
                 break
         return grid_start, grid_end
+
+    def energy_intervals_from_function(self, function: Callable, minimal_interval: float, energy_limits: List[float]) -> list:
+        """
+        Generate a set of energy intervals from a given function. The energy intervals are generated as:
+
+        e_i = \sum_{j=0}^{i-1} * minimal_interval * function(e_j)
+
+        and 
+
+        e_{-i} = -1 * e_i
+
+        **Arguments**
+
+        function: *Callable*
+            function that maps an energy to a number greater or equal 1
+
+        minimal_interval: *float*
+            minimal interval width, i.e. minimal distance between two intervals
+
+        energy_limits: *List[Float]*
+            list [<minimal_energy>, <maximal_energy>] that determines the limits between which energy intervals should be calculated
+        """
+        energies = [0]
+        while energies[-1] < energy_limits[1]:
+            
+            # make sure the minimal interval is kept
+            next_step = max([function(energies[-1]), 1])
+            
+            # get new interval width
+            next_step *= minimal_interval
+
+            # apply to series
+            next_step += sum(energies)
+
+            # update
+            if next_step <= energy_limits[1]:
+                energies.append(next_step)
+            else:
+                break
+        
+        # generate negative indices
+        full_set = [-1 * energy for energy in energies[1:] if energy < abs(energy_limits[0])]
+        
+        # merge negative and positive indices
+        full_set.extend(energies)
+
+        # make sure the sorting is correct
+        full_set.sort()
+
+        return full_set
 
     def _gauss(self, x, mu, sigma, normalized=True):
         coefficient = (np.sqrt(2 * np.pi) * sigma)
