@@ -129,7 +129,7 @@ class Grid():
         """
         Generate a set of energy intervals from a given function. The energy intervals are generated as:
 
-        e_i = \sum_{j=0}^{i-1} * minimal_interval * function(e_j)
+        e_i = \\sum_{j=0}^{i-1} * minimal_interval * function(e_j)
 
         and 
 
@@ -142,8 +142,7 @@ class Grid():
 
         minimal_interval: *float*
             minimal interval width, i.e. minimal distance between two intervals
-
-        energy_limits: *List[Float]*
+        energy_limits: *List[float]*
             list [<minimal_energy>, <maximal_energy>] that determines the limits between which energy intervals should be calculated
         """
         energies = [0]
@@ -174,6 +173,23 @@ class Grid():
         full_set.sort()
 
         return full_set
+
+    def grid_height_from_function(self, function: Callable, energies: list, minimal_height: float) -> list:
+        """
+        Use provided function to calculate the grid height at each energy.
+
+        **Arguments**
+
+        function: *Callable*
+            Function that assigns an integer number to an energy value
+
+        energies: *list*
+            List of energies for which the bin heights are calculated
+
+        minimal_height: *float*
+            Minimal height of a bin
+        """
+        return [max([function(energy), 1]) * minimal_height for energy in energies]
 
     def _gauss(self, x, mu, sigma, normalized=True):
         coefficient = (np.sqrt(2 * np.pi) * sigma)

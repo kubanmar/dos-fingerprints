@@ -60,7 +60,7 @@ def test_grid_from_lists(grid):
 
 def test_energy_intervals_from_function(grid):
 
-    def test_function(value: float):
+    def test_function(value: float) -> int:
         return int(value)
 
     expected_output = [
@@ -68,3 +68,14 @@ def test_energy_intervals_from_function(grid):
     ]
     
     assert grid.energy_intervals_from_function(test_function, 1, [-10,10]) == expected_output, "Wrong energy intervals calculated"
+
+def test_grid_height_from_function(grid):
+
+    def test_function(value: float) -> int:
+        return int(value)
+
+    expected_output = [
+        2, 2, 10, 8
+    ]
+
+    assert grid.grid_height_from_function(test_function, [0.1, 1, 5, 4], 2) == expected_output, "Wrong bin heights calculated"
