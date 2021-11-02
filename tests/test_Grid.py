@@ -64,10 +64,10 @@ def test_energy_intervals_from_function(grid):
         return int(value)
 
     expected_output = [
-        -5, -2, -1, 0, 1, 2, 5
+        -13, -5, -2, -1, 0, 1, 2, 5
     ]
     
-    assert grid.energy_intervals_from_function(test_function, 1, [-10,10]) == expected_output, "Wrong energy intervals calculated"
+    assert grid.energy_intervals_from_function(test_function, 1, [-13,10]) == expected_output, "Wrong energy intervals calculated"
 
 def test_grid_height_from_function(grid):
 
@@ -79,3 +79,18 @@ def test_grid_height_from_function(grid):
     ]
 
     assert grid.grid_height_from_function(test_function, [0.1, 1, 5, 4], 2) == expected_output, "Wrong bin heights calculated"
+
+def test_regression(grid):
+    grid = grid.create()
+    reference = grid.grid()
+    energies = [x[0] for x in reference]
+    max_heights = [x[1][-1] for x in reference]
+
+    assert grid.grid_from_lists(energies, max_heights, grid.num_bins) == reference, "Could not reproduce reference grid"
+
+    def step_sequencer(energy, grid = grid):
+        return grid._step_sequencer(energy, grid.mu, grid.sigma, grid.original_stepsize)
+
+    print(grid.energy_intervals_from_function(step_sequencer, grid.original_stepsize, grid.cutoff))
+
+    assert grid.energy_intervals_from_function(step_sequencer, grid.original_stepsize, [-10.35,5.3]) == energies, "Energy intervals from function does not return original intervals"

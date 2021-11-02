@@ -142,11 +142,17 @@ class Grid():
 
         minimal_interval: *float*
             minimal interval width, i.e. minimal distance between two intervals
+
         energy_limits: *List[float]*
             list [<minimal_energy>, <maximal_energy>] that determines the limits between which energy intervals should be calculated
         """
+        # assumes the spectrum is shifted to the reference energy, which is then located at e = 0
         energies = [0]
-        while energies[-1] < energy_limits[1]:
+        
+        # we need the maximum absolute limit to generate intervals
+        max_limit = max([abs(lim_) for lim_ in energy_limits])
+        
+        while energies[-1] < max_limit:
             
             # make sure the minimal interval is kept
             next_step = max([function(energies[-1]), 1])
@@ -155,19 +161,19 @@ class Grid():
             next_step *= minimal_interval
 
             # apply to series
-            next_step += sum(energies)
+            next_step += energies[-1]
 
             # update
-            if next_step <= energy_limits[1]:
-                energies.append(next_step)
+            if next_step <= max_limit:
+                energies.append(np.round(next_step, 8))
             else:
                 break
         
         # generate negative indices
-        full_set = [-1 * energy for energy in energies[1:] if energy < abs(energy_limits[0])]
+        full_set = [-1 * energy for energy in energies[1:] if energy <= abs(energy_limits[0])]
         
-        # merge negative and positive indices
-        full_set.extend(energies)
+        # filter positive energies to match limits, and merge negative and positive indices
+        full_set.extend(list(filter(lambda x: x <= energy_limits[1], energies)))
 
         # make sure the sorting is correct
         full_set.sort()
