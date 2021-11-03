@@ -105,6 +105,7 @@ def test_regression(grid):
 
     assert grid.energy_intervals_from_function(step_sequencer, grid.original_stepsize, [-10.6,5.05]) == energies, "Energy intervals from function does not return original intervals"
 
+    def step_sequencer_2(energy, grid = grid):
+        return grid._step_sequencer(energy, grid.mu, grid.sigma, 0.1)
 
-def test_fails(grid):
-    pass
+    assert grid.grid_height_from_function(step_sequencer_2, energies, 1/112*56) == max_heights, "Bin heights are not the same as before" 
