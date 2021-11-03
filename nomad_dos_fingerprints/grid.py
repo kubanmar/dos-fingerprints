@@ -1,7 +1,5 @@
 from typing import Callable, List
 import numpy as np
-from numpy.core.fromnumeric import sort
-from numpy.core.numeric import full
 
 class Grid():
     
@@ -196,6 +194,27 @@ class Grid():
             Minimal height of a bin
         """
         return [max([function(energy), 1]) * minimal_height for energy in energies]
+
+    def gauss_function(self, x: float, w_min: float, w_max: float, sigma: float) -> int:
+        """
+        Function that assigns an integer value to each `x`.
+
+        **Arguments**
+
+        x: *float*
+            Input value
+
+        w_min: *float*
+            Minimal width of the interval
+
+        w_max: *float*
+            Maximal width of the interval
+
+        sigma: *float*
+            Parameter controlling the width of the interal gaussian function
+        """
+        value = (1 - np.exp((-1*x**2)/(2 * sigma))) * (w_max / w_min - 1) + 1
+        return int(value)
 
     def _gauss(self, x, mu, sigma, normalized=True):
         coefficient = (np.sqrt(2 * np.pi) * sigma)

@@ -80,10 +80,31 @@ def test_grid_height_from_function(grid):
 
     assert grid.grid_height_from_function(test_function, [0.1, 1, 5, 4], 2) == expected_output, "Wrong bin heights calculated"
 
-def test_regression(grid):
+def test_grid_from_lists_regression(grid):
     grid = grid.create()
     reference = grid.grid()
     energies = [x[0] for x in reference]
     max_heights = [x[1][-1] for x in reference]
 
     assert grid.grid_from_lists(energies, max_heights, grid.num_bins) == reference, "Could not reproduce reference grid"
+
+def test_gauss_function(grid):
+
+    assert [grid.gauss_function(x, 1, 4, 0.2) for x in range(-5,6)] == [4, 4, 3, 3, 3, 1, 3, 3, 3, 4, 4], "Gauss function has changed unexpectedly"
+
+def test_regression(grid):
+    grid = grid.create(mu = 0)
+    reference = grid.grid()
+    energies = [x[0] for x in reference]
+    max_heights = [x[1][-1] for x in reference]
+
+    assert grid.grid_from_lists(energies, max_heights, grid.num_bins) == reference, "Could not reproduce reference grid"
+
+    def step_sequencer(energy, grid = grid):
+        return grid._step_sequencer(energy, grid.mu, grid.sigma, grid.original_stepsize)
+
+    assert grid.energy_intervals_from_function(step_sequencer, grid.original_stepsize, [-10.6,5.05]) == energies, "Energy intervals from function does not return original intervals"
+
+
+def test_fails(grid):
+    pass
