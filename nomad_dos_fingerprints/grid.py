@@ -76,7 +76,6 @@ class Grid():
         for item in x_grid:
             bins = []
             bin_height = self._step_sequencer(item, self.mu, self.sigma, original_stepsize=0.1) / (self.bin_size_factor * 2.)
-            print("old_bin_height", bin_height*self.num_bins)
             for idx in range(1, self.num_bins + 1):
                 bins.append(bin_height * idx)
             grid.append([item, bins])
