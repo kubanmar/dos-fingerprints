@@ -90,7 +90,7 @@ def test_grid_from_lists_regression(grid):
 
 def test_gauss_function(grid):
 
-    assert [grid.gauss_function(x, 1, 4, 0.2) for x in range(-5,6)] == [4, 4, 3, 3, 3, 1, 3, 3, 3, 4, 4], "Gauss function has changed unexpectedly"
+    assert [grid.gauss_function(x, 1, 4, 0.4) for x in range(-5,6)] == [4, 4, 3, 3, 3, 1, 3, 3, 3, 4, 4], "Gauss function has changed unexpectedly"
 
 def test_regression(grid):
     grid = grid.create(mu = 0)
@@ -109,3 +109,25 @@ def test_regression(grid):
         return grid._step_sequencer(energy, grid.mu, grid.sigma, 0.1)
 
     assert grid.grid_height_from_function(step_sequencer_2, energies, 1/112*56) == max_heights, "Bin heights are not the same as before" 
+
+    reference_gauss = []
+    new_gauss = []
+
+    for e in energies:
+        reference_gauss.append(grid._step_sequencer(e, grid.mu, grid.sigma, grid.original_stepsize))
+        new_gauss.append(grid.gauss_function(e, 0.05, 1.05, grid.sigma))
+
+    assert new_gauss == reference_gauss, "Functions do not return same values"
+
+def test_new_grid(grid):
+    grid = grid.create(grid_id='dg_cut:512:0:4:(-3, 3):1024')
+
+    reference_grid = grid.grid()
+
+    new_grid = grid.grid_new(0.05, 1.05, 0.25, 2.75, 4, 512, [-3, 3])
+
+    new_grid_energies = [x[0] for x in new_grid]
+
+    assert new_grid_energies == [x[0] for x in reference_grid], "Grid energies do not agree."
+
+    assert new_grid == reference_grid, "Could not reproduce old grid."

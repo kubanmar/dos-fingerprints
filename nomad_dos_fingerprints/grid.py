@@ -1,5 +1,6 @@
 from typing import Callable, List
 import numpy as np
+from functools import partial
 
 class Grid():
     
@@ -75,9 +76,27 @@ class Grid():
         for item in x_grid:
             bins = []
             bin_height = self._step_sequencer(item, self.mu, self.sigma, original_stepsize=0.1) / (self.bin_size_factor * 2.)
+            print("old_bin_height", bin_height*self.num_bins)
             for idx in range(1, self.num_bins + 1):
                 bins.append(bin_height * idx)
             grid.append([item, bins])
+        return grid
+
+    def grid_new(self, delta_e_min, delta_e_max, delta_rho_min, delta_rho_max, sigma, n_pix, cutoff):
+        """
+        New implementation of the grid. Follows the description in the publication.
+        """
+
+        f_energies = partial(self.gauss_function, w_min = delta_e_min, w_max = delta_e_max, sigma = sigma) 
+
+        energies = self.energy_intervals_from_function(f_energies, delta_e_min, cutoff)
+
+        f_heights = partial(self.gauss_function, w_min = delta_rho_min, w_max = delta_rho_max, sigma = sigma) 
+
+        max_heights = self.grid_height_from_function(f_heights, energies, delta_rho_min)
+
+        grid = self.grid_from_lists(energies, max_heights, n_pix)
+
         return grid
 
     def grid_from_lists(self, energies: list, max_heights: list, n_bins: int) -> list:
@@ -161,10 +180,14 @@ class Grid():
             # apply to series
             next_step += energies[-1]
 
+            # increase numerical stability
+            next_step = np.round(next_step, 8)
+
             # update
             if next_step <= max_limit:
-                energies.append(np.round(next_step, 8))
+                energies.append(next_step)
             else:
+                print(f"last entry was {next_step}")
                 break
         
         # generate negative indices
@@ -213,7 +236,8 @@ class Grid():
         sigma: *float*
             Parameter controlling the width of the interal gaussian function
         """
-        value = (1 - np.exp((-1*x**2)/(2 * sigma))) * (w_max / w_min - 1) + 1
+        g = (1 - np.exp(-0.5 * (x / sigma)**2))
+        value = g * (w_max / w_min - 1) + 1
         return int(value)
 
     def _gauss(self, x, mu, sigma, normalized=True):
