@@ -20,6 +20,16 @@ from nomad_dos_fingerprints import tanimoto_similarity
 tc = tanimoto_similarity(dos_fingerprint_1, dos_fingerprint_2)
 ```
 
+# Citation
+
+If you want to use this package, please cite:
+
+Martin Kuban, Santiago Rigamonti, Markus Scheidgen, and Claudia Draxl
+
+"Density-of-states similarity descriptor for unsupervised learning from materials data" 
+
+preprint: https://arxiv.org/abs/2201.02187 
+
 # References
 
 [1] Isayev _et al._, Chem. Mater. 2015, 27, 3, 735–743 (doi:10.1021/cm503507h)
