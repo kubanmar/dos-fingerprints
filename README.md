@@ -24,10 +24,8 @@ tc = tanimoto_similarity(dos_fingerprint_1, dos_fingerprint_2)
 
 If you want to use this package, please cite:
 
-Martin Kuban, Santiago Rigamonti, Markus Scheidgen, and Claudia Draxl
-
-"Density-of-states similarity descriptor for unsupervised learning from materials data" 
-
+Martin Kuban, Santiago Rigamonti, Markus Scheidgen, and Claudia Draxl:
+"Density-of-states similarity descriptor for unsupervised learning from materials data",
 preprint: https://arxiv.org/abs/2201.02187 
 
 # References
