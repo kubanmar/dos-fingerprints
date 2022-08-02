@@ -1,8 +1,8 @@
 This package implements fingerprints of the electronic density-of-states (DOS) for the evaluation of similarity of materials based on their electronic structures.
 
-The fingerprints are based on a modification on the D-Fingerprints presented in Ref. [1].
-Our modification allows to target specific energy ranges for the evaluation of the similarity of the electronic structure.
-As a similarity measure we use the Tanimoto coefficient [2].
+The fingerprints correspond to those introduced in Refs. [1,2]. Our fingerprints allow to target specific energy ranges for the evaluation of the similarity of the electronic structure. 
+
+As a similarity measure we use the Tanimoto coefficient [3].
 
 # Usage
 
@@ -30,6 +30,13 @@ preprint: https://arxiv.org/abs/2201.02187
 
 # References
 
-[1] Isayev _et al._, Chem. Mater. 2015, 27, 3, 735–743 (doi:10.1021/cm503507h)
+[1] Martin Kuban, Santiago Rigamonti, Markus Scheidgen, and Claudia Draxl:
+"Density-of-states similarity descriptor for unsupervised learning from materials data",
+preprint: https://arxiv.org/abs/2201.02187 
 
-[2] P. Willet _et al._, J. Chem. Inf. Comput . 38 , 983 996 (1998) (doi:10.1021/ci9800211)
+[2] Martin Kuban, Šimon Gabaj, Wahib Aggoune, Cecilia Vona, Santiago Rigamonti, Claudia Draxl:
+"Similarity of materials and data-quality assessment by fingerprinting"
+preprint: https://arxiv.org/abs/2204.04056
+
+
+[3] P. Willet _et al._, J. Chem. Inf. Comput . 38 , 983 996 (1998) (doi:10.1021/ci9800211)
