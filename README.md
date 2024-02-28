@@ -29,17 +29,22 @@ tc = tanimoto_similarity(dos_fingerprint_1, dos_fingerprint_2)
 If you use this package in a publication, please cite it in the following way:
 
 Martin Kuban, Santiago Rigamonti, Markus Scheidgen, and Claudia Draxl:
-"Density-of-states similarity descriptor for unsupervised learning from materials data",
-preprint: https://arxiv.org/abs/2201.02187
+_Density-of-states similarity descriptor for unsupervised learning from materials data_
+Sci Data *9*, 646 (2022). https://doi.org/10.1038/s41597-022-01754-z
+
+# Links
+
+We maintain a notebook in the NOMAD AI Toolkit:
+https://nomad-lab.eu/aitoolkit/tutorial-dos-similarity
 
 # References
 
 [1] Martin Kuban, Santiago Rigamonti, Markus Scheidgen, and Claudia Draxl:
-"Density-of-states similarity descriptor for unsupervised learning from materials data",
-preprint: https://arxiv.org/abs/2201.02187
+_Density-of-states similarity descriptor for unsupervised learning from materials data_.
+_Sci Data_ *9*, 646 (2022). https://doi.org/10.1038/s41597-022-01754-z
 
 [2] Martin Kuban, Šimon Gabaj, Wahib Aggoune, Cecilia Vona, Santiago Rigamonti, Claudia Draxl:
-"Similarity of materials and data-quality assessment by fingerprinting",
-MRS Bulletin (2022). https://doi.org/10.1557/s43577-022-00339-w
+_Similarity of materials and data-quality assessment by fingerprinting_.
+_MRS Bulletin_ *47*, 991–999 (2022). https://doi.org/10.1557/s43577-022-00339-w
 
-[3] P. Willet _et al._, J. Chem. Inf. Comput . 38 , 983 996 (1998) (doi:10.1021/ci9800211)
+[3] P. Willet _et al._, _J. Chem. Inf. Comput._ *38* , 983 996 (1998) (https://doi.org/10.1021/ci9800211)

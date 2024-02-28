@@ -1,7 +1,9 @@
-*/__pycache__
+__pycache__
 *.egg-info
 *.code-workspace
-run_tests.bat
 .vscode
 .coverage*
 .pytest_cache
+notebooks
+build
+venvs

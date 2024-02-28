@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name="nomad_dos_fingerprints"
+version="2.0.0"
+description = "Fingerprints of the electronic density of states of materials."
+readme = {file = "README.md", content-type = "text/markdown"}
+authors = [
+    {name="Martin Kuban et al."}
+]
+maintainers = [
+    {name="Martin Kuban", email="kuban@physik.hu-berlin.de"}
+]
+requires-python = ">= 3.7"
+dependencies = [
+    "numpy >= 1.22.2",
+    "bitarray == 2.4.1",
+    "matplotlib == 3.5.1"
+
+]
+license = {file = "LICENSE"}
+
+[project.optional-dependencies]
+tests = ['pytest']
+
+[project.urls]
+Repository = "https://github.com/kubanmar/dos-fingerprints"
+
+[tool.setuptools.packages.find]
+include=["nomad_dos_fingerprints"]
+exclude=["tests"]
