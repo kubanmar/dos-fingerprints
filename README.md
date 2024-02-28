@@ -10,7 +10,7 @@ As a similarity measure we use the Tanimoto coefficient [3].
 
 # Usage
 
-Fingerprints are instances of the `DOSFingerprint()` class and can be calculated by providing the energy in [Joule] and the DOS in [states/unit cell/Joule] to the `calculate()` method. Furthermore, the energy axis can be discretized over a non-uniform grid. For this, specific parameters must be provided. By default, the grid is specialized on the energy range between -10 and 5 eV, thereby emphasizing the upper valence region.
+Fingerprints are instances of the `DOSFingerprint()` class and can be calculated by providing the energy in [eV] and the DOS in [states/unit cell/eV] to the `calculate()` method. Furthermore, the energy axis can be discretized over a non-uniform grid. For this, specific parameters must be provided. By default, the grid is specialized on the energy range between -10 and 5 eV, thereby emphasizing the upper valence region.
 
 ```Python
 from nomad_dos_fingerprints import DOSFingerprint
