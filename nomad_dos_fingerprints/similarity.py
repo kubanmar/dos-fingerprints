@@ -19,6 +19,7 @@ def match_fingerprints(fingerprint1, fingerprint2) -> Tuple[bitarray, bitarray]:
     dsp2 = (start_index - fingerprint2.indices[0]) * num_bins
     dep1 = (fingerprint1.indices[1] - stop_index) * num_bins
     dep2 = (fingerprint2.indices[1] - stop_index) * num_bins
+    # slice
     fp1 = fp1[dsp1:len(fp1) - dep1]
     fp2 = fp2[dsp2:len(fp2) - dep2]
     return fp1, fp2

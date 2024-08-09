@@ -3,6 +3,7 @@ from bitarray import bitarray
 from functools import partial
 from typing import Callable, List, Union
 from itertools import groupby
+import re
 
 from .grid import Grid
 from .similarity import tanimoto_similarity
@@ -433,13 +434,8 @@ class DOSFingerprint():
         return compressed_string
 
     def _expand_fingerprint_string(self, compressed_fingerprint_string):
-        current_string = ''
         decompressed_string = ''
-        for char in compressed_fingerprint_string:
-            if char.isnumeric():
-                current_string += char 
-            else:
-                number_to_add = '1' if char == 't' else '0'
-                decompressed_string += number_to_add * int(current_string)
-                current_string = ''
+        for bits in re.findall("(\d+\w)", compressed_fingerprint_string):
+            value = '1' if bits[-1] == 't' else '0'
+            decompressed_string += value * int(bits[:-1])
         return decompressed_string
