@@ -3,7 +3,7 @@ import pytest
 
 from nomad_dos_fingerprints import tanimoto_similarity
 from nomad_dos_fingerprints import DOSFingerprint, Grid
-from nomad_dos_fingerprints.DOSfingerprint import ELECTRON_CHARGE
+from scipy.constants import electron_volt
 
 def test_integrate_to_bins():
 
@@ -31,10 +31,10 @@ def test_convert_dos():
     test_data_x = np.arange(1, 5, step = 0.01)
     test_data_y = test_data_x
     fp = DOSFingerprint(stepsize=0.001)
-    x, y = fp._convert_dos(test_data_x* ELECTRON_CHARGE, [test_data_y/2 / ELECTRON_CHARGE, test_data_y/2 / ELECTRON_CHARGE])
+    x, y = fp._convert_dos(test_data_x* electron_volt, [test_data_y/2 / electron_volt, test_data_y/2 / electron_volt])
     assert np.isclose(x,test_data_x).all()
     assert np.isclose(y, test_data_y).all()
-    x, y = fp._convert_dos(test_data_x* ELECTRON_CHARGE, [test_data_y/ ELECTRON_CHARGE])
+    x, y = fp._convert_dos(test_data_x* electron_volt, [test_data_y/ electron_volt])
     assert np.isclose(x,test_data_x).all()
     assert np.isclose(y, test_data_y).all()
 

@@ -17,7 +17,8 @@ requires-python = ">= 3.7"
 dependencies = [
     "numpy >= 1.22.2",
     "bitarray == 2.4.1",
-    "matplotlib"
+    "matplotlib",
+    "scipy"
 ]
 license = {file = "LICENSE"}
 

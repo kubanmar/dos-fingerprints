@@ -23,10 +23,12 @@ test_grid = Grid.create(**grid_attrs)
 
 calc_params={"grid":test_grid, "convert_data":None}
 
+fp = DOSFingerprint().calculate(x, y, **calc_params)
+
 pr = cProfile.Profile()
 pr.enable()
-for _ in range(100):
-    fp = DOSFingerprint().calculate(x, y, **calc_params)
+for _ in range(10000):
+    fp.get_similarity(fp)
 pr.disable()
 
 s = io.StringIO()

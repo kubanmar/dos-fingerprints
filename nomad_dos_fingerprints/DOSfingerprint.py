@@ -8,7 +8,8 @@ import re
 from .grid import Grid
 from .similarity import tanimoto_similarity
 
-ELECTRON_CHARGE = 1.602176565e-19
+from scipy.constants import electron_volt
+
 
 class DOSFingerprint():
     """
@@ -34,6 +35,7 @@ class DOSFingerprint():
         self.grid_id = None
         self.set_similarity_function(similarity_function, **kwargs)
         self._n_state_bins = None
+        self._bitarray = None
 
     @property
     def n_state_bins(self):
@@ -44,7 +46,8 @@ class DOSFingerprint():
 
     def calculate(self, 
                   dos_energies: np.ndarray, 
-                  dos_values: np.ndarray, 
+                  dos_values: np.ndarray,
+                  grid: Grid | None = None, 
                   grid_id: str = None, 
                   convert_data: Union[None, str, Callable] = None, 
                   normalization_factor: float = 1.0) -> object:
@@ -69,9 +72,19 @@ class DOSFingerprint():
 
         **Keyword arguments:**
 
+        grid: `Grid` object
+            Grid for calculating the fingerprint.  
+            For details, see documentation there.
+
+            If both `grid` and `grid_id` are given and they don't represent the same grid, a `ValueError` is raised.
+
+            default: `None`
+
         grid_id: `str`
             ID for describing the `Grid` object that is used to calculate the fingerprint data.
             For details, see documentation there.
+
+            If both `grid` and `grid_id` are given and they don't represent the same grid, a `ValueError` is raised.
 
             default: `None`: Use `Grid` default values.
 
@@ -108,11 +121,16 @@ class DOSFingerprint():
             energy, dos = dos_energies, dos_values
         else:
             raise ValueError('Key-word argument `convert_data` must be either the string "enc", a callable, or `None`.')
-        grid = Grid.create(grid_id = grid_id)
+        if grid is None:
+            grid = Grid.create(grid_id = grid_id)
+        else:
+            if grid_id is not None and grid.get_grid_id() != grid_id:
+                raise ValueError('Both grid and grid_id are given and do not correspond to the same grid.')
         energy = np.array(energy) - grid.e_ref
         raw_energies, raw_dos = self._integrate_to_bins(energy, dos, grid.delta_e_min)
         self.grid_id = grid_id if grid_id is not None else grid.get_grid_id()
         bin_fp = self._calculate_bit_fingerprint(raw_energies, raw_dos, grid)
+        self._bitarray = bitarray(bin_fp)
         self.bins = self._compress_binary_fingerprint_string(bin_fp)
         self._n_state_bins = grid.n_pix
         return self
@@ -205,8 +223,11 @@ class DOSFingerprint():
         """
         if self.bins == '':
             raise AttributeError("Fingerprint is not calculated! Use `calculate()`.")
+        if self._bitarray is not None:
+            return self._bitarray
         bit_string = self._expand_fingerprint_string(self.bins)
         bits = bitarray(bit_string)
+        self._bitarray = bits
         return bits
 
     def __eq__(self, other):
@@ -296,9 +317,9 @@ class DOSFingerprint():
         """
         Convert units of DOS from energy: Joule; dos: states/volume/Joule to eV and sum spin channels if they are present.
         """
-        energy = np.array([value / ELECTRON_CHARGE for value in energy])
+        energy = np.array([value / electron_volt for value in energy])
         dos_channels = [np.array(values) for values in dos]
-        dos = sum(dos_channels) * ELECTRON_CHARGE * normalization_factor
+        dos = sum(dos_channels) * electron_volt * normalization_factor
         return energy, dos
 
     def _binary_bin(self, dos_value: float, grid_bins: np.ndarray):

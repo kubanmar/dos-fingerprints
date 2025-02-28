@@ -1,6 +1,6 @@
 from typing import Callable, List, Set
 import numpy as np
-from functools import partial
+from functools import partial, cache
 
 class NotCreatedError(Exception):
     """
@@ -176,11 +176,11 @@ class Grid():
         """
         self._check_created()
         if self.grid_type == "nonuniform":
-            grid = self._grid_non_uniform(self.delta_e_min, self.delta_e_max, self.delta_rho_min, self.delta_rho_max, self.width, self.n_pix, [self.cutoff_min, self.cutoff_max])
+            grid = self._grid_non_uniform(self.delta_e_min, self.delta_e_max, self.delta_rho_min, self.delta_rho_max, self.width, self.n_pix, (self.cutoff_min, self.cutoff_max))
         elif self.grid_type == "uniform":
-            grid = self._grid_uniform(self.delta_e_min, self.delta_rho_min, self.n_pix, [self.cutoff_min, self.cutoff_max])
+            grid = self._grid_uniform(self.delta_e_min, self.delta_rho_min, self.n_pix, (self.cutoff_min, self.cutoff_max))
         elif self.grid_type == "custom":
-            grid = self._grid_custom(self.energy_discretization, self.states_discretization, self.n_pix)
+            grid = self._grid_custom(tuple(self.energy_discretization), tuple(self.states_discretization), self.n_pix)
         else:
             raise ValueError("Grid type can not be identified")
         return grid
@@ -191,6 +191,7 @@ class Grid():
         """
         return Grid.create(grid_id=self.get_grid_id())
 
+    @cache
     def _grid_non_uniform(self, delta_e_min, delta_e_max, delta_rho_min, delta_rho_max, width, n_pix, cutoff):
         """
         New implementation of the grid. Follows the description in the publication.
@@ -208,6 +209,7 @@ class Grid():
 
         return grid
 
+    @cache
     def _grid_uniform(self, delta_e, delta_rho, n_pix, cutoff):
 
         def f_energies(x):
@@ -221,6 +223,7 @@ class Grid():
 
         return grid
         
+    @cache
     def _grid_custom(self, energy_discretization, states_discretization, n_pix):
         return self.grid_from_lists(energy_discretization, states_discretization, n_pix)
 
