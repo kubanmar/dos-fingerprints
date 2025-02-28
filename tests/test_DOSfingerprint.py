@@ -5,6 +5,14 @@ from nomad_dos_fingerprints import tanimoto_similarity
 from nomad_dos_fingerprints import DOSFingerprint, Grid
 from scipy.constants import electron_volt
 
+def test_fails_for_wrong_grid_id_options():
+    fp = DOSFingerprint()   
+    grid = Grid.create(grid_id = fp.grid_id)
+    grid_new = Grid.create(grid_id = fp.grid_id)
+    grid_new.e_ref = -100 
+    with pytest.raises(ValueError):
+        fp.calculate([0,1], [0,1], grid=grid, grid_id=grid_new.get_grid_id())
+
 def test_integrate_to_bins():
 
     def get_area_below_curve(x, func, fp):
