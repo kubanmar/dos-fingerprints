@@ -383,3 +383,6 @@ class Grid():
     def _check_created(self):
         if not hasattr(self, "grid_type"):
             raise NotCreatedError("Grid was not created. To do so, use Grid.create(**parameters).")
+        
+    def __repr__(self):
+        return f"Grid({self.get_grid_id()})"
