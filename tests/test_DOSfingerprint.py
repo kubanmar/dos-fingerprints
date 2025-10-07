@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+from bitarray import bitarray
 
 from nomad_dos_fingerprints import tanimoto_similarity
 from nomad_dos_fingerprints import DOSFingerprint, Grid
@@ -109,6 +110,7 @@ def test_get_similarity():
     fp_b = DOSFingerprint().calculate(x, [1 if x_i > 0.25 else 0 for x_i in x], grid_id = grid.get_grid_id())
     assert fp_a.get_similarity(fp_b) == 0.5, "Similarity obtained from get_similarity is wrong"
 
-@pytest.mark.skip()
 def test_get_bitarray():
-    raise NotImplementedError("TODO: Implement")
+    fp = DOSFingerprint()
+    fp.bins = "3t4f2t"
+    assert fp.get_bitarray() == bitarray('111000011')

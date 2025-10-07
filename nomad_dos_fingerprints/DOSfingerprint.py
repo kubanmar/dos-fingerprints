@@ -456,7 +456,7 @@ class DOSFingerprint():
 
     def _expand_fingerprint_string(self, compressed_fingerprint_string):
         decompressed_string = ''
-        for bits in re.findall("(\d+\w)", compressed_fingerprint_string):
+        for bits in re.findall(r"(\d+\w)", compressed_fingerprint_string):
             value = '1' if bits[-1] == 't' else '0'
             decompressed_string += value * int(bits[:-1])
         return decompressed_string

@@ -94,3 +94,17 @@ def test_uniform_grid(grid):
     ]
 
     assert grid.grid() == expected_uniform_grid, "Create wrong uniform grid"
+
+def test_equality(grid):
+    grid1 = grid.create()
+    grid1_v2 = grid.create(n_pix=12)
+    grid2 = grid.create(grid_type='uniform')
+    grid3 = grid.create(grid_type='custom', states_discretization=[0,1], energy_discretization=[0,1])
+
+    assert grid1 == grid1, 'Same grid are not equal'
+    assert grid1_v2 == grid1_v2, 'Same grid are not equal'
+    assert grid2 == grid2, 'Same grid are not equal'
+    assert grid3 == grid3, 'Same grid are not equal'
+
+    assert grid1 != grid2, 'Different grids are equal'
+    assert grid1 != grid1_v2, 'Different grids are equal'
