@@ -1,10 +1,12 @@
 from typing import Union, Iterable
 
 import matplotlib.pyplot as plt
+from copy import deepcopy
 
 from nomad_dos_fingerprints import DOSFingerprint, Grid
 
 def _apply_grid_offset(grid_array: list, offset: float):
+    grid_array = deepcopy(grid_array)
     for idx in range(len(grid_array)):
         grid_array[idx][0] += offset
     return grid_array
