@@ -1,9 +1,18 @@
 import numpy as np
 import pytest
+from bitarray import bitarray
 
 from nomad_dos_fingerprints import tanimoto_similarity
 from nomad_dos_fingerprints import DOSFingerprint, Grid
-from nomad_dos_fingerprints.DOSfingerprint import ELECTRON_CHARGE
+from scipy.constants import electron_volt
+
+def test_fails_for_wrong_grid_id_options():
+    fp = DOSFingerprint()   
+    grid = Grid.create(grid_id = fp.grid_id)
+    grid_new = Grid.create(grid_id = fp.grid_id)
+    grid_new.e_ref = -100 
+    with pytest.raises(ValueError):
+        fp.calculate([0,1], [0,1], grid=grid, grid_id=grid_new.get_grid_id())
 
 def test_integrate_to_bins():
 
@@ -31,10 +40,10 @@ def test_convert_dos():
     test_data_x = np.arange(1, 5, step = 0.01)
     test_data_y = test_data_x
     fp = DOSFingerprint(stepsize=0.001)
-    x, y = fp._convert_dos(test_data_x* ELECTRON_CHARGE, [test_data_y/2 / ELECTRON_CHARGE, test_data_y/2 / ELECTRON_CHARGE])
+    x, y = fp._convert_dos(test_data_x* electron_volt, [test_data_y/2 / electron_volt, test_data_y/2 / electron_volt])
     assert np.isclose(x,test_data_x).all()
     assert np.isclose(y, test_data_y).all()
-    x, y = fp._convert_dos(test_data_x* ELECTRON_CHARGE, [test_data_y/ ELECTRON_CHARGE])
+    x, y = fp._convert_dos(test_data_x* electron_volt, [test_data_y/ electron_volt])
     assert np.isclose(x,test_data_x).all()
     assert np.isclose(y, test_data_y).all()
 
@@ -101,6 +110,7 @@ def test_get_similarity():
     fp_b = DOSFingerprint().calculate(x, [1 if x_i > 0.25 else 0 for x_i in x], grid_id = grid.get_grid_id())
     assert fp_a.get_similarity(fp_b) == 0.5, "Similarity obtained from get_similarity is wrong"
 
-@pytest.mark.skip()
 def test_get_bitarray():
-    raise NotImplementedError("TODO: Implement")
+    fp = DOSFingerprint()
+    fp.bins = "3t4f2t"
+    assert fp.get_bitarray() == bitarray('111000011')

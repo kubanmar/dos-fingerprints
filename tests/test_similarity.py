@@ -2,7 +2,8 @@ import os
 import json
 from nomad_dos_fingerprints import tanimoto_similarity
 from nomad_dos_fingerprints.similarity import match_fingerprints
-from nomad_dos_fingerprints.DOSfingerprint import ELECTRON_CHARGE, DOSFingerprint
+from nomad_dos_fingerprints.DOSfingerprint import DOSFingerprint
+from scipy.constants import electron_volt
 
 
 with open(os.path.join(os.path.dirname(__file__), 'fingerprint_generation_test_data.json'), 'r') as test_data_file:
@@ -46,8 +47,8 @@ def test_matching_of_spectra():
     data = test_data["17661:2634879"]
     cut_energies = []
     cut_dos = []
-    cut_energies = [e for e,d in zip(data['dos_energies'], data['dos_values'][0]) if (e / ELECTRON_CHARGE > -7.3 and e / ELECTRON_CHARGE < 2)]
-    cut_dos = [d for e,d in zip(data['dos_energies'], data['dos_values'][0]) if (e / ELECTRON_CHARGE > -7.3 and e / ELECTRON_CHARGE < 2)]
+    cut_energies = [e for e,d in zip(data['dos_energies'], data['dos_values'][0]) if (e / electron_volt > -7.3 and e / electron_volt < 2)]
+    cut_dos = [d for e,d in zip(data['dos_energies'], data['dos_values'][0]) if (e / electron_volt > -7.3 and e / electron_volt < 2)]
     fp = DOSFingerprint().calculate(data['dos_energies'], data['dos_values'], convert_data="enc")
     cut_fp = DOSFingerprint().calculate(cut_energies, [cut_dos], convert_data="enc")
     assert tanimoto_similarity(cut_fp, fp) == tanimoto_similarity(fp, cut_fp)
